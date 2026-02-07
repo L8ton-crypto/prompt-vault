@@ -21,6 +21,7 @@ export default function Home() {
   const [loading, setLoading] = useState(true);
   const [copiedId, setCopiedId] = useState<number | null>(null);
   const [showFavorites, setShowFavorites] = useState(false);
+  const [expandedId, setExpandedId] = useState<number | null>(null);
 
   useEffect(() => {
     fetchPrompts();
@@ -177,11 +178,25 @@ export default function Home() {
                   </button>
                 </div>
                 
-                <p className="text-xs text-gray-400 mb-3 line-clamp-3">
-                  {prompt.content.substring(0, 200)}...
-                </p>
+                <div 
+                  className="cursor-pointer"
+                  onClick={() => setExpandedId(expandedId === prompt.id ? null : prompt.id)}
+                >
+                  {expandedId === prompt.id ? (
+                    <pre className="text-xs text-gray-300 mb-3 whitespace-pre-wrap font-sans bg-gray-900/50 p-3 rounded-lg">
+                      {prompt.content}
+                    </pre>
+                  ) : (
+                    <p className="text-xs text-gray-400 mb-3 line-clamp-3">
+                      {prompt.content.substring(0, 200)}...
+                    </p>
+                  )}
+                  <span className="text-[10px] text-purple-400 hover:text-purple-300">
+                    {expandedId === prompt.id ? "▲ Collapse" : "▼ Expand full prompt"}
+                  </span>
+                </div>
                 
-                <div className="flex items-center gap-2 flex-wrap mb-3">
+                <div className="flex items-center gap-2 flex-wrap mb-3 mt-2">
                   {prompt.tags.map((tag, i) => (
                     <span 
                       key={i}
@@ -193,7 +208,7 @@ export default function Home() {
                 </div>
                 
                 <button
-                  onClick={() => copyPrompt(prompt)}
+                  onClick={(e) => { e.stopPropagation(); copyPrompt(prompt); }}
                   className={`w-full py-2 rounded-lg text-xs font-medium transition-colors ${
                     copiedId === prompt.id
                       ? "bg-green-600 text-white"
